@@ -156,6 +156,11 @@ contract('Trust', function(accounts) {
       assert.equal(balance, web3.toWei(0.002, 'ether'), "contract balance does not equal to player sent")
     });
 
+    it("...first player who have withdrawn should not be able to withdraw again", async function() {
+      const instance = await Trust.deployed();
+      await expectThrow(instance.withdraw.sendTransaction({from: accounts[1]}));
+    });
+
     it("...second player should withdraw what he pay", async function() {
       const instance = await Trust.deployed();
       instance.withdraw.sendTransaction({from: accounts[2]});
@@ -174,11 +179,11 @@ contract('Trust', function(accounts) {
 
     it("...thrid player should withdraw what he pay", async function() {
       const instance = await Trust.deployed();
-      instance.withdraw.sendTransaction({from: accounts[2]});
+      instance.withdraw.sendTransaction({from: accounts[3]});
       var eventLogs = await getEventLogs(instance, {
         event: "PlayerWithdrawn",
         args: {
-          _player: accounts[2]
+          _player: accounts[3]
         }
       });
       assert.equal(eventLogs.length, 1);
@@ -265,6 +270,11 @@ contract('Trust', function(accounts) {
 
       const balance = await proxiedWeb3.eth.getBalance(instance.address);
       assert.equal(balance, web3.toWei(0, 'ether'), "contract balance does not equal to player sent")
+    });
+
+    it("...second player who have withdrawn should not be able to withdraw again", async function() {
+      const instance = await Trust.deployed();
+      await expectThrow(instance.withdraw.sendTransaction({from: accounts[2]}));
     });
   });
 });
@@ -423,6 +433,11 @@ contract('Trust', function(accounts) {
 
       const balance = await proxiedWeb3.eth.getBalance(instance.address);
       assert.equal(balance, web3.toWei(0, 'ether'), "contract balance does not equal to player sent")
+    });
+
+    it("...owner who have withdrawn should not be able to withdraw again", async function() {
+      const instance = await Trust.deployed();
+      await expectThrow(instance.withdraw.sendTransaction({from: accounts[0]}));
     });
   });
 });
