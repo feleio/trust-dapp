@@ -22,15 +22,11 @@ contract Trust {
     playerCount = 0;
   }
 
-  modifier onlyOwner() {
-    require(msg.sender == owner);
-    _;
-  }
-
   function play(bool _isTrust) payable public {
-    require(playerCount < 3);
-    require(msg.value >= price);
-    players[playerCount++] = Decision(msg.sender, _isTrust, false);
+    require(playerCount < 3 && msg.value >= price);
+    players[playerCount].player = msg.sender;
+    players[playerCount].isTrust = _isTrust;
+    playerCount += 1;
     PlayerDecided(msg.sender, playerCount);
   }
 
