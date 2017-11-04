@@ -13,7 +13,11 @@ contract('Trust', function(accounts) {
 
       await instance.play(true, {value: web3.toWei(0.001, 'ether'), from: accounts[1]});
       const playerCount = await instance.playerCount();
-      assert.equal(playerCount, 1, "player count does not increment")
+      assert.equal(playerCount, 1, "player count does not increment");
+      const decision = await instance.find(0);
+      assert.equal(decision[0], accounts[1]);
+      assert.equal(decision[1], true);
+      assert.equal(decision[2], false);
 
       const balance = await proxiedWeb3.eth.getBalance(instance.address);
       assert.equal(balance, web3.toWei(0.001, 'ether'), "contract balance does not equal to player sent")
@@ -47,6 +51,11 @@ contract('Trust', function(accounts) {
       const balance = await proxiedWeb3.eth.getBalance(instance.address);
       assert.equal(balance, web3.toWei(0.001 * 2, 'ether'), "contract balance does not equal to player sent")
 
+      const decision = await instance.find(1);
+      assert.equal(decision[0], accounts[2]);
+      assert.equal(decision[1], false);
+      assert.equal(decision[2], false);
+
       const eventLogs = await getEventLogs(instance, {
         event: "PlayerDecided",
         args: {
@@ -69,6 +78,11 @@ contract('Trust', function(accounts) {
       const balance = await proxiedWeb3.eth.getBalance(instance.address);
       assert.equal(balance, web3.toWei(0.001 * 3, 'ether'), "contract balance does not equal to player sent")
 
+      const decision = await instance.find(2);
+      assert.equal(decision[0], accounts[3]);
+      assert.equal(decision[1], true);
+      assert.equal(decision[2], false);
+
       const eventLogs = await getEventLogs(instance, {
         event: "PlayerDecided",
         args: {
@@ -87,6 +101,8 @@ contract('Trust', function(accounts) {
       await expectThrow(instance.play(true, {value: web3.toWei(0.001, 'ether'), from: accounts[4]}));
       const playerCount = await instance.playerCount();
       assert.equal(playerCount, 3, "player count does not increment")
+
+      await expectThrow(instance.find(3));
 
       const balance = await proxiedWeb3.eth.getBalance(instance.address);
       assert.equal(balance, web3.toWei(0.001 * 3, 'ether'), "contract balance does not equal to player sent")
@@ -142,7 +158,12 @@ contract('Trust', function(accounts) {
 
     it("...first player should withdraw what he pay", async function() {
       const instance = await Trust.deployed();
-      instance.withdraw.sendTransaction({from: accounts[1]});
+      await instance.withdraw.sendTransaction({from: accounts[1]});
+      const decision = await instance.find(0);
+      assert.equal(decision[0], accounts[1]);
+      assert.equal(decision[1], true);
+      assert.equal(decision[2], true);
+
       var eventLogs = await getEventLogs(instance, {
         event: "PlayerWithdrawn",
         args: {
@@ -163,7 +184,12 @@ contract('Trust', function(accounts) {
 
     it("...second player should withdraw what he pay", async function() {
       const instance = await Trust.deployed();
-      instance.withdraw.sendTransaction({from: accounts[2]});
+      await instance.withdraw.sendTransaction({from: accounts[2]});
+      const decision = await instance.find(1);
+      assert.equal(decision[0], accounts[2]);
+      assert.equal(decision[1], true);
+      assert.equal(decision[2], true);
+
       var eventLogs = await getEventLogs(instance, {
         event: "PlayerWithdrawn",
         args: {
@@ -179,7 +205,11 @@ contract('Trust', function(accounts) {
 
     it("...thrid player should withdraw what he pay", async function() {
       const instance = await Trust.deployed();
-      instance.withdraw.sendTransaction({from: accounts[3]});
+      await instance.withdraw.sendTransaction({from: accounts[3]});
+      const decision = await instance.find(2);
+      assert.equal(decision[0], accounts[3]);
+      assert.equal(decision[1], true);
+      assert.equal(decision[2], true);
       var eventLogs = await getEventLogs(instance, {
         event: "PlayerWithdrawn",
         args: {
@@ -258,7 +288,7 @@ contract('Trust', function(accounts) {
 
     it("...second player should withdraw all because he/she is traitor", async function() {
       const instance = await Trust.deployed();
-      instance.withdraw.sendTransaction({from: accounts[2]});
+      await instance.withdraw.sendTransaction({from: accounts[2]});
       var eventLogs = await getEventLogs(instance, {
         event: "PlayerWithdrawn",
         args: {
@@ -342,7 +372,7 @@ contract('Trust', function(accounts) {
 
     it("...owner can withdraw all", async function() {
       const instance = await Trust.deployed();
-      instance.withdraw.sendTransaction({from: accounts[0]});
+      await instance.withdraw.sendTransaction({from: accounts[0]});
       var eventLogs = await getEventLogs(instance, {
         event: "PlayerWithdrawn",
         args: {
@@ -421,7 +451,7 @@ contract('Trust', function(accounts) {
 
     it("...owner can withdraw all", async function() {
       const instance = await Trust.deployed();
-      instance.withdraw.sendTransaction({from: accounts[0]});
+      await instance.withdraw.sendTransaction({from: accounts[0]});
       var eventLogs = await getEventLogs(instance, {
         event: "PlayerWithdrawn",
         args: {

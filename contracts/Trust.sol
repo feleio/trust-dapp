@@ -63,4 +63,9 @@ contract Trust {
       PlayerWithdrawn(msg.sender, price * 3);
     }
   }
+
+  function find(uint userId) constant public returns (address player, bool isTrust, bool isWithDrawn) {
+    require(userId < playerCount);
+    return (players[userId].player, players[userId].isTrust, players[userId].isWithDrawn);
+  }
 }
