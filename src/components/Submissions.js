@@ -181,14 +181,14 @@ class Submissions extends Component {
           else
             return (
               <div>
-                <h2>You win {priceInEther} in this game</h2>
+                <h2>You win {priceInEther * 3} in this game</h2>
                 <button type="button" className="pure-button pure-input-1-2 button-success"
                         onClick={this.handleWithdrawClick}>Withdraw
                 </button>
               </div>
             )
         else
-          return <h2>You lost {priceInEther * 3} in this game</h2>
+          return <h2>You lost {priceInEther} in this game</h2>
       } else {
         if(currentAccount === this.state.owner){
           return (
@@ -215,20 +215,22 @@ class Submissions extends Component {
         <h3>{priceInEther} ether will be taken for each decision submitted</h3>
         <div>
           <table>
-            <tr>
-              <th><strong>Player</strong></th>
-              {this.state.submissions.length == 3 && <th><strong>Did Trust?</strong></th>}
-              <th><strong>has withDraw?</strong></th>
-            </tr>
-            {this.state.submissions.map((submission) => {
-              return(
-                <tr>
-                  <td>{submission.player}</td>
-                  {this.state.submissions.length == 3 && <td>{submission.isTrust.toString()}</td>}
-                  <td>{submission.isWithDrawn.toString()}</td>
-                </tr>
-              )
-            })}
+            <tbody>
+              <tr>
+                <th><strong>Player</strong></th>
+                {this.state.submissions.length == 3 && <th><strong>Did Trust?</strong></th>}
+                <th><strong>has withDraw?</strong></th>
+              </tr>
+              {this.state.submissions.map((submission, i) => {
+                return(
+                  <tr key={i}>
+                    <td>{submission.player}</td>
+                    {this.state.submissions.length == 3 && <td>{submission.isTrust.toString()}</td>}
+                    <td>{submission.isWithDrawn.toString()}</td>
+                  </tr>
+                )
+              })}
+            </tbody>
           </table>
         </div>
         <Loader loaded={!this.state.loading}>

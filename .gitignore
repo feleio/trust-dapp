@@ -33,6 +33,7 @@ Temporary Items
 ### ReactNative.Gradle Stack ###
 .gradle
 **/build/
+**/build_webpack/
 
 # Ignore Gradle GUI config
 gradle-app.setting
