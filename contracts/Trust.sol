@@ -7,7 +7,7 @@ contract Trust {
     bool isWithDrawn;
   }
 
-  address owner;
+  address public owner;
   uint public price;
   uint public playerCount;
 
@@ -15,6 +15,7 @@ contract Trust {
 
   event PlayerDecided(address indexed _player, uint _playerCount);
   event PlayerWithdrawn(address indexed _player, uint _amount);
+  event Reset();
 
   function Trust(uint _price) {
     owner = msg.sender;
@@ -26,6 +27,7 @@ contract Trust {
     require(playerCount < 3 && msg.value >= price);
     players[playerCount].player = msg.sender;
     players[playerCount].isTrust = _isTrust;
+    players[playerCount].isWithDrawn = false;
     playerCount += 1;
     PlayerDecided(msg.sender, playerCount);
   }
@@ -35,12 +37,12 @@ contract Trust {
 
     uint trustCount = 0;
     uint notWithdrawPlayerIdx = 3;
-    Decision memory traitor;
+    uint traitorIdx;
 
     for(uint i=0; i< 3;i++){
       trustCount += players[i].isTrust ? 1 : 0;
       if (!players[i].isTrust){
-        traitor = players[i];
+        traitorIdx = i;
       }
       if (msg.sender == players[i].player && !players[i].isWithDrawn){
         notWithdrawPlayerIdx = i;
@@ -53,15 +55,27 @@ contract Trust {
       players[notWithdrawPlayerIdx].isWithDrawn = true;
       PlayerWithdrawn(msg.sender, price);
     } else if (trustCount == 2){
-      require(msg.sender == traitor.player && !traitor.isWithDrawn);
+      require(msg.sender == players[traitorIdx].player && !players[traitorIdx].isWithDrawn);
       msg.sender.transfer(price * 3);
-      traitor.isWithDrawn = true;
+      players[traitorIdx].isWithDrawn = true;
       PlayerWithdrawn(msg.sender, price * 3);
     } else {
       require(msg.sender == owner && this.balance >= price * 3);
       msg.sender.transfer(price * 3);
       PlayerWithdrawn(msg.sender, price * 3);
     }
+  }
+
+  function ownerWithdraw() public {
+    require(msg.sender == owner);
+    msg.sender.transfer(this.balance);
+    PlayerWithdrawn(msg.sender, this.balance);
+  }
+
+  function reset() {
+    require(playerCount == 3 && this.balance == 0);
+    playerCount = 0;
+    Reset();
   }
 
   function find(uint userId) constant public returns (address player, bool isTrust, bool isWithDrawn) {

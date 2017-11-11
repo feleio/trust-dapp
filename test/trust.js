@@ -216,11 +216,24 @@ contract('Trust', function(accounts) {
           _player: accounts[3]
         }
       });
+
       assert.equal(eventLogs.length, 1);
       assert(eventLogs[0].args._amount, 0.001);
 
       const balance = await proxiedWeb3.eth.getBalance(instance.address);
       assert.equal(balance, web3.toWei(0, 'ether'), "contract balance does not equal to player sent")
+    });
+
+    it("...reset successfully", async function() {
+      const instance = await Trust.deployed();
+      await instance.reset.sendTransaction({from: accounts[0]});
+      const playerCount = await instance.playerCount();
+      assert.equal(playerCount, 0);
+
+      var eventLogs = await getEventLogs(instance, {
+        event: "Reset"
+      });
+      assert.equal(eventLogs.length, 1);
     });
   });
 });
@@ -306,6 +319,18 @@ contract('Trust', function(accounts) {
       const instance = await Trust.deployed();
       await expectThrow(instance.withdraw.sendTransaction({from: accounts[2]}));
     });
+
+    it("...reset successfully", async function() {
+      const instance = await Trust.deployed();
+      await instance.reset.sendTransaction({from: accounts[0]});
+      const playerCount = await instance.playerCount();
+      assert.equal(playerCount, 0);
+
+      var eventLogs = await getEventLogs(instance, {
+        event: "Reset"
+      });
+      assert.equal(eventLogs.length, 1);
+    });
   });
 });
 
@@ -384,6 +409,18 @@ contract('Trust', function(accounts) {
 
       const balance = await proxiedWeb3.eth.getBalance(instance.address);
       assert.equal(balance, web3.toWei(0, 'ether'), "contract balance does not equal to player sent")
+    });
+
+    it("...reset successfully", async function() {
+      const instance = await Trust.deployed();
+      await instance.reset.sendTransaction({from: accounts[0]});
+      const playerCount = await instance.playerCount();
+      assert.equal(playerCount, 0);
+
+      var eventLogs = await getEventLogs(instance, {
+        event: "Reset"
+      });
+      assert.equal(eventLogs.length, 1);
     });
   });
 });
@@ -468,6 +505,18 @@ contract('Trust', function(accounts) {
     it("...owner who have withdrawn should not be able to withdraw again", async function() {
       const instance = await Trust.deployed();
       await expectThrow(instance.withdraw.sendTransaction({from: accounts[0]}));
+    });
+
+    it("...reset successfully", async function() {
+      const instance = await Trust.deployed();
+      await instance.reset.sendTransaction({from: accounts[0]});
+      const playerCount = await instance.playerCount();
+      assert.equal(playerCount, 0);
+
+      var eventLogs = await getEventLogs(instance, {
+        event: "Reset"
+      });
+      assert.equal(eventLogs.length, 1);
     });
   });
 });

@@ -11,4 +11,5 @@ Simple 3-player decision game.
   3. Otherwise, owner will get full amount of fund and all players will get nothing.
 
 # TODO: Players can cheat in this game
-As decision made by players stored in the block-chain is not encrypted. Players is able to see decisions of previous players before making decision.
+1. As decision made by players stored in the block-chain is not encrypted. Players is able to see decisions of previous players before making decision.
+2. The game should be able automatically reset after everyone is withdraw the ether. Reset from owner is no needed.

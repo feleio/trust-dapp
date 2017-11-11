@@ -10,28 +10,23 @@ let getWeb3 = new Promise(function(resolve, reject) {
     if (typeof web3 !== 'undefined') {
       // Use Mist/MetaMask's provider.
       web3 = new Web3(web3.currentProvider)
-
-      results = {
-        web3: web3
-      }
-
       console.log('Injected web3 detected.');
-
-      resolve(results)
-    } else {
+    } else if (process.env.NODE_ENV === "development") {
       // Fallback to localhost if no web3 injection.
       var provider = new Web3.providers.HttpProvider('http://localhost:8545')
-
       web3 = new Web3(provider)
+      console.log('No web3 instance injected, using Local web3.');
+    }
 
-      results = {
-        web3: web3
+    web3.eth.getAccounts((err, accounts) => {
+      if (err) {
+        return reject(err);
       }
 
-      console.log('No web3 instance injected, using Local web3.');
-
-      resolve(results)
-    }
+      web3.eth.defaultAccount = accounts[0];
+      console.log('Using account:', web3.eth.defaultAccount);
+      resolve({web3: web3});
+    });
   })
 })
 
